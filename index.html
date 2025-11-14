@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Estudo: Absolutismo Joanino (1706-1750)</title>
+    <!-- Carrega o Tailwind CSS para estilos modernos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importa a fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* --- Animações das Abas --- */
+        .tab-content {
+            transition: opacity 0.4s ease-in-out;
+            opacity: 0; /* Começa invisível por defeito */
+        }
+        .tab-content.hidden {
+            display: none;
+            opacity: 0;
+        }
+        .tab-content.active {
+            display: block; /* JS irá mudar para 'block' */
+            opacity: 1; /* A transição fará o fade-in */
+        }
+        /* A primeira aba (Guia) é visível por defeito */
+        #guide.active {
+            opacity: 1;
+        }
+
+        /* Estilo para o botão da aba ativa */
+        .tab-button.active {
+            border-bottom-width: 4px;
+            border-bottom-color: #2563EB; /* blue-600 */
+            color: #1E40AF; /* blue-800 */
+            font-weight: 600;
+        }
+        /* Estilo para as respostas dissertativas ocultas */
+        .essay-answer {
+            display: none;
+            border-left: 4px solid #D1D5DB; /* gray-300 */
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+            background-color: #F9FAFB; /* gray-50 */
+        }
+        /* Estilos para o feedback do quiz */
+        .feedback-message {
+            display: none;
+            padding: 0.75rem 1rem;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .feedback-correct {
+            background-color: #F0FDF4; /* green-50 */
+            color: #15803D; /* green-700 */
+            border: 1px solid #BBF7D0; /* green-200 */
+        }
+        .feedback-incorrect {
+            background-color: #FEF2F2; /* red-50 */
+            color: #B91C1C; /* red-700 */
+            border: 1px solid #FECACA; /* red-200 */
+        }
+        /* Estilo para perguntas com múltiplas respostas */
+        .question-multiple-choice label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Estilos do Jogo de Associação --- */
+        .term-drop-zone {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .term-drop-zone.drag-over {
+            background-color: #EFF6FF; /* blue-50 */
+            border-color: #60A5FA; /* blue-400 */
+        }
+        .definition-draggable {
+            transition: box-shadow 0.2s, opacity 0.2s;
+        }
+        .definition-draggable.dragging {
+            opacity: 0.5;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .drop-target {
+            min-height: 5rem; /* Garante espaço para largar */
+        }
+        /* Feedback de acerto/erro */
+        .zone-correct {
+            border: 2px solid #22C55E; /* green-500 */
+            background-color: #F0FDF4; /* green-50 */
+        }
+        .zone-incorrect {
+            border: 2px solid #EF4444; /* red-500 */
+            background-color: #FEF2F2; /* red-50 */
+        }
+
+        /* Animação da barra de progresso */
+        #progressBar {
+            transition: width 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-8 max-w-6xl">
+        <!-- Cabeçalho e Título -->
+        <header class="bg-white p-6 rounded-lg shadow-md mb-6 border-b-4 border-blue-600">
+            <h1 class="text-3xl font-bold text-blue-800">Guia de Estudo Interativo</h1>
+            <p class="text-xl text-gray-600 mt-1">O Absolutismo Joanino e o Seu Legado (1706-1750)</p>
+        </header>
+
+        <!-- Campo para o nome do aluno -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <label for="studentName" class="block text-lg font-medium text-gray-700 mb-2">Insira o seu nome para o relatório final:</label>
+            <input type="text" id="studentName" placeholder="O seu nome..." class="w-full sm:w-1/2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h3 class="text-lg font-semibold mb-3 text-gray-700">O Seu Progresso</h3>
+            <div class="flex items-center gap-4">
+                <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-cyan-400 h-4 rounded-full" style="width: 0%;"></div>
+                </div>
+                <span id="progressText" class="font-bold text-blue-700 text-lg">0%</span>
+            </div>
+            <div id="progressTracker" class="text-sm text-gray-600 mt-2">
+                <span id="guideProgressText">Guia: 0/7</span> | 
+                <span id="quizProgressText">Questionário: 0/1</span> | 
+                <span id="essayProgressText">Dissertativas: 0/1</span> | 
+                <span id="glossaryProgressText">Glossário: 0/1</span>
+            </div>
+        </div>
+
+        <!-- Navegação por Abas (MODIFICADA) -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <nav class="flex flex-wrap border-b border-gray-200" aria-label="Tabs">
+                <button class="tab-button active py-4 px-6 text-lg font-medium text-gray-500 hover:text-blue-700" onclick="showTab('guide')">
+                    Guia de Estudo
+                </button>
+                <!-- Botão do Questionário agora está desativado por defeito -->
+                <button id="quiz-tab-button" class="tab-button py-4 px-6 text-lg font-medium text-gray-400 cursor-not-allowed" onclick="showTab('quiz')" disabled>
+                    Questionário
+                </button>
+                <button class="tab-button py-4 px-6 text-lg font-medium text-gray-500 hover:text-blue-700" onclick="showTab('essays')">
+                    Questões Dissertativas
+                </button>
+                <button class="tab-button py-4 px-6 text-lg font-medium text-gray-500 hover:text-blue-700" onclick="showTab('glossary')">
+                    Glossário
+                </button>
+                <!-- Botão de Relatório REMOVIDO daqui -->
+            </nav>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <main class="bg-white p-6 sm:p-8 rounded-lg shadow-md">
+
+            <!-- Aba 1: Guia de Estudo -->
+            <div id="guide" class="tab-content active space-y-6">
+                
+                <!-- NOVO: Secção do Vídeo -->
+                <div class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-inner">
+                    <h2 class="text-2xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Recurso Multimédia: Ouro e Sombra</h2>
+                    
+                    <video class="w-full rounded-lg shadow-md" controls>
+                        <source src="./A_Era_de_Ouro_e_Sombra.mp4" type="video/mp4">
+                        O seu navegador não suporta a tag de vídeo.
+                    </video>
+                    
+                    <p class="text-sm text-gray-300 mt-3 italic text-center">
+                        <strong>Nota Importante:</strong> Para este vídeo funcionar, o ficheiro "A_Era_de_Ouro_e_Sombra.mp4" deve estar na mesma pasta que este ficheiro .html.
+                    </p>
+                </div>
+                <!-- Fim da Secção do Vídeo -->
+
+                <!-- ... (Conteúdo do Guia de Estudo - sem alteração) ... -->
+                <h2 class="text-2xl font-semibold text-blue-700 border-b pb-2">Guia de Estudo: Pontos-Chave</h2>
+                <p class="text-base">Use esta secção para rever os conceitos fundamentais. Expanda cada secção para a marcar como lida.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-gray-50 p-3 rounded-lg border">
+                    <p id="guideCounter" class="text-sm font-semibold text-blue-700 mb-2 sm:mb-0">Secções lidas: 0 de 7</p>
+                    <button onclick="markAllAsRead()" class="text-sm bg-blue-100 text-blue-700 font-medium py-1 px-3 rounded-lg hover:bg-blue-200 transition-colors">
+                        Marcar todas como lidas
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-1')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            A Estrutura do Poder Absoluto
+                            <span id="check-guide-1" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">D. João V consolidou o poder régio, tornando-se o "primeiro rei absoluto português". Inspirado em Luís XIV (França), recusou-se a convocar as Cortes (assembleia dos três estados) durante todo o seu reinado e centralizou a administração através de Secretarias de Estado.</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-2')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            A Base Financeira: Ouro do Brasil
+                            <span id="check-guide-2" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">A descoberta de ouro e diamantes no Brasil deu à coroa uma autonomia financeira sem precedentes. Esta riqueza, juntamente com o comércio de açúcar, tabaco e sal, financiou a "política de grandeza" do rei, a opulência da corte (festas, óperas) e as obras monumentais, sem depender de impostos aprovados pelas Cortes.</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-3')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            A Arte como Propaganda: O Barroco
+                            <span id="check-guide-3" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">O estilo Barroco foi usado como propaganda da monarquia e da Igreja. Características principais: grandiosidade, <span class="font-medium">"horror ao vazio"</span> (preenchimento total do espaço), linhas curvas, e uso luxuoso de <span class="font-medium">talha dourada</span>, <span class="font-medium">azulejos</span> e mármores coloridos.</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-4')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            Obras Emblemáticas
+                            <span id="check-guide-4" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <ul class="mt-2 text-gray-700 list-disc list-inside space-y-1">
+                            <li><strong>Palácio-Convento de Mafra:</strong> Símbolo máximo do poder régio e da aliança com a Igreja. Integrava palácio, basílica, convento e biblioteca.</li>
+                            <li><strong>Aqueduto das Águas Livres:</strong> Monumental obra de engenharia para abastecer Lisboa de água.</li>
+                            <li><strong>Biblioteca Joanina (Coimbra):</strong> "Obra-prima do Barroco" que simboliza o investimento régio no conhecimento.</li>
+                        </ul>
+                    </details>
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-5')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            A Sociedade de Ordens
+                            <span id="check-guide-5" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">A sociedade do Antigo Regime era rígida e dividida em três ordens: Clero, Nobreza e Povo. O Clero e a Nobreza eram os grupos privilegiados: não pagavam impostos, tinham leis e tribunais próprios e ocupavam os cargos mais altos. O Povo (maioria da população) suportava toda a carga fiscal.</p>
+                    </details>
+                    <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-6')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            A Sombra da Inquisição
+                            <span id="check-guide-6" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">O Tribunal do Santo Ofício (Inquisição) era uma instituição temida que perseguia desvios à fé católica, sendo os <span class="font-medium">cristãos-novos</span> (acusados de judaísmo) as principais vítimas. Os <span class="font-medium">Autos de Fé</span> eram cerimónias públicas de punição, usadas como espetáculo de controlo social, muitas vezes com a presença do rei, o que funcionava como um ato político de legitimação.</p>
+                    </details>
+                     <details class="bg-gray-50 p-4 rounded-lg cursor-pointer hover:shadow-sm" ontoggle="trackReading('guide-7')">
+                        <summary class="font-semibold text-lg text-gray-800 flex justify-between items-center">
+                            Conceito Central: "Ouro e Sombra"
+                            <span id="check-guide-7" class="hidden text-green-500 ml-2 font-bold text-xl">✓</span>
+                        </summary>
+                        <p class="mt-2 text-gray-700">O reinado de D. João V é dual. O "Ouro" (riqueza do Brasil, esplendor do Barroco, obras) e a "Sombra" (Inquisição, sociedade rígida) não eram opostos, mas sim duas faces da mesma moeda do Absolutismo. O mesmo poder centralizado financiava a arte e legitimava a repressão para manter o controlo.</p>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Aba 2: Questionário (MODIFICADA) -->
+            <div id="quiz" class="tab-content hidden">
+                <!-- Wrapper do Conteúdo (visível quando desbloqueado) -->
+                <div id="quiz-content-wrapper" style="display: none;">
+                    <h2 class="text-2xl font-semibold text-blue-700 border-b pb-2">Questionário Interativo</h2>
+                    <p class="my-4">Teste os seus conhecimentos. Selecione as respostas e clique em "Submeter Questionário" no final.</p>
+                    <form id="quiz-form" class="space-y-8">
+                        <div id="quiz-container" class="space-y-6"></div>
+                        <div class="border-t pt-6 text-center">
+                            <button type="button" onclick="submitQuiz()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-colors text-lg">
+                                Submeter Questionário e Ver Relatório
+                            </button>
+                        </div>
+                    </form>
+                    <div id="gabarito-container" class="hidden mt-8">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-4">Gabarito Completo</h3>
+                        <div id="gabarito-content" class="bg-gray-50 p-4 rounded-lg space-y-2"></div>
+                    </div>
+                </div>
+                <!-- Overlay de Bloqueio (visível por defeito) -->
+                <div id="quiz-lock-overlay" class="text-center p-10 border-4 border-dashed border-gray-300 rounded-lg bg-gray-50" style="display: block;">
+                    <h3 class="text-2xl font-semibold text-gray-700">Questionário Bloqueado</h3>
+                    <p class="text-lg text-gray-600 mt-4">Para desbloquear o questionário, deve primeiro completar todas as outras atividades:</p>
+                    <ul class="list-disc list-inside text-left max-w-md mx-auto mt-4 space-y-2 text-gray-600">
+                        <li id="lock-req-guide">Completar a leitura do Guia de Estudo (7/7 secções).</li>
+                        <li id="lock-req-essays">Visitar e interagir com as Questões Dissertativas.</li>
+                        <li id="lock-req-glossary">Completar o exercício de associação do Glossário (acertar 10/10).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Aba 3: Questões Dissertativas -->
+            <div id="essays" class="tab-content hidden">
+                <!-- ... (Conteúdo das Questões Dissertativas - sem alteração) ... -->
+                <h2 class="text-2xl font-semibold text-blue-700 border-b pb-2">Questões Dissertativas Ativas</h2>
+                <p class="my-4">Reflita sobre os temas centrais. Tente escrever a sua resposta e depois compare-a com a proposta.</p>
+                <div class="space-y-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">1. Relacione a riqueza proveniente do Brasil com a consolidação do poder absoluto de D. João V.</h3>
+                        <div class="mt-4">
+                            <label for="essay-q1" class="block text-sm font-medium text-gray-700">Tente escrever a sua resposta:</label>
+                            <textarea id="essay-q1" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5" placeholder="Escreva aqui os pontos-chave da sua resposta..."></textarea>
+                        </div>
+                        <button onclick="toggleAnswer(this)" class="text-sm text-blue-600 hover:underline mt-2">
+                            Comparar com a Resposta Proposta
+                        </button>
+                        <div class="essay-answer text-gray-700 mt-2">
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <strong class="text-blue-800">Conceitos-Chave a incluir:</strong>
+                                <ul class="list-disc list-inside text-sm">
+                                    <li>Autonomia financeira (Ouro e diamantes)</li>
+                                    <li>Não-convocação das Cortes</li>
+                                    <li>Financiamento da "política de grandeza"</li>
+                                    <li>Obras como propaganda (ex: Mafra)</li>
+                                </ul>
+                            </div>
+                            <strong class="font-semibold">Proposta de Resposta:</strong>
+                            <p>A riqueza do Brasil, especialmente o ouro e os diamantes, foi o pilar financeiro do absolutismo joanino. Este fluxo de capital permitiu a D. João V governar com uma autonomia sem precedentes, pois não precisava de negociar impostos com as Cortes (que, por isso, nunca convocou). Este dinheiro financiou a "política de grandeza": a opulência da corte, o mecenato cultural e as obras monumentais (como Mafra), que funcionavam como propaganda do seu poder, reforçando a sua imagem de monarca absoluto e magnânimo.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">2. Descreva como o estilo Barroco foi utilizado como um instrumento de propaganda política e religiosa no reinado joanino.</h3>
+                        <div class="mt-4">
+                            <label for="essay-q2" class="block text-sm font-medium text-gray-700">Tente escrever a sua resposta:</label>
+                            <textarea id="essay-q2" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5" placeholder="Escreva here os pontos-chave da sua resposta..."></textarea>
+                        </div>
+                        <button onclick="toggleAnswer(this)" class="text-sm text-blue-600 hover:underline mt-2">
+                            Comparar com a Resposta Proposta
+                        </button>
+                        <div class="essay-answer text-gray-700 mt-2">
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <strong class="text-blue-800">Conceitos-Chave a incluir:</strong>
+                                <ul class="list-disc list-inside text-sm">
+                                    <li>Ferramenta ideológica</li>
+                                    <li>Grandiosidade / Exuberância</li>
+                                    <li>"Horror ao vazio" e Talha dourada</li>
+                                    <li>Impressionar e subjugar</li>
+                                    <li>Alinhamento Monarquia-Igreja (Contrarreforma)</li>
+                                </ul>
+                            </div>
+                            <strong class="font-semibold">Proposta de Resposta:</strong>
+                            <p>O Barroco Joanino foi uma ferramenta ideológica. A sua grandiosidade, o "horror ao vazio" (preenchimento de todo o espaço) e a exuberância da talha dourada e dos mármores não eram apenas estéticos; destinavam-se a impressionar, comover e subjugar o observador. Ao patrocinar igrejas e palácios neste estilo, D. João V projetava uma imagem de poder, riqueza e fé inabalável, alinhando a sua autoridade (monarquia absoluta) com a da Igreja (Contrarreforma), mostrando-se como o defensor máximo da fé.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">3. Analise a principal contradição do reinado de D. João V, exemplificando com a Biblioteca Joanina e a Inquisição.</h3>
+                        <div class="mt-4">
+                            <label for="essay-q3" class="block text-sm font-medium text-gray-700">Tente escrever a sua resposta:</label>
+                            <textarea id="essay-q3" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5" placeholder="Escreva here os pontos-chave da sua resposta..."></textarea>
+                        </div>
+                        <button onclick="toggleAnswer(this)" class="text-sm text-blue-600 hover:underline mt-2">
+                            Comparar com a Resposta Proposta
+                        </button>
+                        <div class="essay-answer text-gray-700 mt-2">
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <strong class="text-blue-800">Conceitos-Chave a incluir:</strong>
+                                <ul class="list-disc list-inside text-sm">
+                                    <li>Contradição / Paradoxo</li>
+                                    <li>Biblioteca Joanina (Esplendor cultural, "Luzes")</li>
+                                    <li>Inquisição (Repressão institucional)</li>
+                                    <li>Autos de Fé / Cristãos-novos</li>
+                                    <li>Promoção vs. repressão do pensamento</li>
+                                </ul>
+                            </div>
+                            <strong class="font-semibold">Proposta de Resposta:</strong>
+                            <p>A principal contradição é o paradoxo entre o esplendor cultural e a repressão institucional. Por um lado, D. João V investiu no conhecimento, construindo a Biblioteca Joanina em Coimbra, uma "obra-prima do Barroco" e um templo do saber em pleno "século das Luzes". Por outro lado, durante o seu reinado, a Inquisição (Tribunal do Santo Ofício) continuou a ser uma das instituições mais temidas, perseguindo, torturando e queimando pessoas (especialmente cristãos-novos) por desvios à fé. Assim, o mesmo rei que promovia o conhecimento, presidia a Autos de Fé que reprimiam a liberdade de pensamento.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">4. Explique a estrutura da sociedade de ordens e de que forma esta sustentava o regime absolutista.</h3>
+                        <div class="mt-4">
+                            <label for="essay-q4" class="block text-sm font-medium text-gray-700">Tente escrever a sua resposta:</label>
+                            <textarea id="essay-q4" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5" placeholder="Escreva here os pontos-chave da sua resposta..."></textarea>
+                        </div>
+                        <button onclick="toggleAnswer(this)" class="text-sm text-blue-600 hover:underline mt-2">
+                            Comparar com a Resposta Proposta
+                        </button>
+                        <div class="essay-answer text-gray-700 mt-2">
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <strong class="text-blue-800">Conceitos-Chave a incluir:</strong>
+                                <ul class="list-disc list-inside text-sm">
+                                    <li>Três ordens: Clero, Nobreza, Povo</li>
+                                    <li>Grupos privilegiados vs. não privilegiados</li>
+                                    <li>Isenção de impostos vs. carga fiscal</li>
+                                    <li>Base de sustentação do regime (lealdade das elites)</li>
+                                </ul>
+                            </div>
+                            <strong class="font-semibold">Proposta de Resposta:</strong>
+                            <p>A sociedade era rigidamente dividida em três ordens: Clero, Nobreza e Povo. O Clero e a Nobreza eram os grupos privilegiados: não pagavam impostos, tinham leis e tribunais próprios e ocupavam os cargos de topo na administração e no exército. O Povo (a vasta maioria) não tinha privilégios e suportava toda a carga fiscal. Esta estrutura hierárquica e desigual era a base do Absolutismo, pois garantia a lealdade das elites (Nobreza e Clero) ao rei, que, por sua vez, lhes garantia os privilégios. O Povo, sem poder, sustentava economicamente todo o sistema.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">5. Discuta o conceito de "Ouro e Sombra" para caracterizar o legado do absolutismo joanino.</h3>
+                        <div class="mt-4">
+                            <label for="essay-q5" class="block text-sm font-medium text-gray-700">Tente escrever a sua resposta:</label>
+                            <textarea id="essay-q5" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5" placeholder="Escreva here os pontos-chave da sua resposta..."></textarea>
+                        </div>
+                        <button onclick="toggleAnswer(this)" class="text-sm text-blue-600 hover:underline mt-2">
+                            Comparar com a Resposta Proposta
+                        </button>
+                        <div class="essay-answer text-gray-700 mt-2">
+                            <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <strong class="text-blue-800">Conceitos-Chave a incluir:</strong>
+                                <ul class="list-disc list-inside text-sm">
+                                    <li>Dualidade / Legado complexo</li>
+                                    <li>"Ouro" (Esplendor, riqueza, Barroco, Mafra)</li>
+                                    <li>"Sombra" (Repressão, Inquisição, Autos de Fé)</li>
+                                    <li>Não eram opostos, mas sim duas faces do mesmo sistema</li>
+                                    <li>Propaganda (Ouro) vs. Controlo Social (Sombra)</li>
+                                </ul>
+                            </div>
+                            <strong class="font-semibold">Proposta de Resposta:</strong>
+                            <p>"Ouro e Sombra" resume a dualidade do reinado. O "Ouro" representa o esplendor: a riqueza do Brasil, a magnificência do Barroco, obras como Mafra e o Aqueduto, e a projeção de Portugal como um reino poderoso. A "Sombra" representa o lado repressivo: a atuação temida da Inquisição, os Autos de Fé, a perseguição aos cristãos-novos e uma sociedade estratificada e injusta. O relatório conclui que não eram forças opostas, mas sim duas faces do mesmo sistema absolutista: o mesmo poder centralizado que usava o ouro para a propaganda cultural, usava a sombra da Inquisição para o controlo social e religioso.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba 4: Glossário -->
+            <div id="glossary" class="tab-content hidden">
+                <!-- ... (Conteúdo do Glossário - sem alteração) ... -->
+                <h2 class="text-2xl font-semibold text-blue-700 border-b pb-2">Glossário de Termos-Chave</h2>
+                <details class="bg-gray-50 p-4 rounded-lg cursor-pointer my-6">
+                    <summary class="font-semibold text-lg text-gray-800">Mostrar/Ocultar Lista de Termos-Chave</summary>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Absolutismo Joanino</h3>
+                            <p class="text-gray-700 text-sm">Modelo de governação de D. João V (1706-1750), caracterizado pela concentração total do poder no rei, que governava sem a convocação das Cortes, e pela utilização da riqueza colonial para financiar uma política de grandeza e propaganda.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Auto de Fé</h3>
+                            <p class="text-gray-700 text-sm">Cerimónia pública onde a Inquisição anunciava e executava as sentenças (penitência ou morte na fogueira) dos condenados por heresia. Funcionava como um espetáculo de poder para intimidar a população.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Azulejos</h3>
+                            <p class="text-gray-700 text-sm">Painéis de cerâmica vidrada, extensivamente usados no Barroco Joanino para decorar o interior e exterior de igrejas e palácios, muitas vezes narrando histórias religiosas ou cenas do quotidiano.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Barroco</h3>
+                            <p class="text-gray-700 text-sm">Estilo artístico que dominou o período joanino, caracterizado pela grandiosidade, dramatismo, "horror ao vazio" (decoração intensa), linhas curvas e uso de materiais luxuosos (talha dourada, mármores).</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Cortes</h3>
+                            <p class="text-gray-700 text-sm">A assembleia tradicional do reino português, que reunia os representantes das três ordens sociais (Clero, Nobreza e Povo). D. João V notabilizou-se por nunca as ter convocado.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Cristãos-Novos</h3>
+                            <p class="text-gray-700 text-sm">Descendentes de judeus convertidos à força ao cristianismo. Eram as principais vítimas da Inquisição, frequentemente acusados de praticar o judaísmo em segredo.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Horror ao Vazio (Horror Vacui)</h3>
+                            <p class="text-gray-700 text-sm">Uma característica chave da estética Barroca, que consiste em preencher toda a superfície disponível com decoração (talha, pintura, azulejos), de forma a criar um efeito de opulência e esplendor.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Inquisição (Tribunal do Santo Ofício)</h3>
+                            <p class="text-gray-700 text-sm">Instituição da Igreja Católica destinada a garantir a "pureza da fé", perseguindo, torturando e condenando aqueles considerados hereges. Em Portugal, foi um instrumento de controlo social e religioso.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Sociedade de Ordens</h3>
+                            <p class="text-gray-700 text-sm">Estrutura social do Antigo Regime, baseada na desigualdade de nascimento. Dividia-se em Clero e Nobreza (grupos privilegiados, isentos de impostos) e Povo (grupo não privilegiado, que pagava os impostos).</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border">
+                            <h3 class="font-semibold text-lg text-gray-900">Talha Dourada</h3>
+                            <p class="text-gray-700 text-sm">Madeira esculpida e revestida a folha de ouro. Foi usada de forma exuberante no interior das igrejas barrocas em Portugal, graças à abundância de ouro do Brasil, para materializar a riqueza do reino e o poder divino.</p>
+                        </div>
+                    </div>
+                </details>
+                <div class="mt-8 border-t pt-8">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Exercício: Associar Termos</h3>
+                    <p class="mb-6 text-gray-700">Arraste a definição correta (à direita) para cima do termo correspondente (à esquerda).</p>
+                    <div id="matching-game" class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <div id="term-targets" class="space-y-4"></div>
+                        <div id="definition-draggables-container" class="border border-gray-200 rounded-lg p-4 bg-gray-50 min-h-[20rem]">
+                            <p class="text-sm font-semibold text-gray-600 mb-4">Arraste estas definições:</p>
+                            <div id="definition-draggables" class="space-y-4"></div>
+                        </div>
+                    </div>
+                    <div id="matching-feedback" class="mt-6 text-lg font-medium text-center"></div>
+                    <div class="mt-6 text-center space-x-4">
+                        <button onclick="checkMatchingGame()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-blue-700 transition-colors">
+                            Verificar Respostas
+                        </button>
+                        <button onclick="initMatchingGame()" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-gray-700 transition-colors">
+                            Recomeçar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba 5: Relatório Final (MODIFICADA) -->
+            <!-- Este conteúdo existe mas não é navegável; só é mostrado via showTab('report') -->
+            <div id="report" class="tab-content hidden">
+                 <!-- O conteúdo aqui será gerado pelo JavaScript (generateReport) -->
+                <h2 class="text-2xl font-semibold text-blue-700 border-b pb-2">Relatório Final e Certificado</h2>
+                <div id="report-content" class="mt-6 text-lg space-y-4">
+                    <p>Por favor, complete o questionário para ver o seu certificado e relatório final.</p>
+                </div>
+                
+                <!-- Revisão das respostas do questionário (mantém-se) -->
+                <div id="report-review" class="mt-8 hidden">
+                     <h3 class="text-xl font-semibold text-gray-800 mb-4">Revisão Detalhada das Respostas (Tentativa Atual)</h3>
+                     <div id="report-review-list" class="space-y-4">
+                        <p id="review-message" class="hidden text-green-700 font-semibold"></p>
+                     </div>
+                </div>
+                
+                <!-- Botões de Repetir (REMOVIDOS) -->
+                <!-- 
+                <div id="retry-buttons-container" class="hidden mt-8 text-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="retry-incorrect-btn" onclick="retryIncorrect()" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors">
+                        Repetir Questões Erradas
+                    </button>
+                    <button id="restart-quiz-btn" onclick="restartQuiz()" class="w-full sm:w-auto bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+                        Repetir Questionário (Completo)
+                    </button>
+                </div>
+                -->
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Lógica da Aplicação (JavaScript) ---
+
+        // --- Gestão de Progresso (MODIFICADO) ---
+        let progress = {
+            guideSections: new Set(),
+            quizCompleted: false, // Para a barra de progresso
+            quizPersistentScore: 0, // Para o certificado (0-75)
+            essaysViewed: false, // Para a barra de progresso
+            glossaryGameCompleted: false, // Para a barra de progresso
+            glossaryScore: 0 // Para o certificado (0-10)
+        };
+        const totalProgressPoints = 10; // 7 secções do guia + 1 questionário + 1 dissertativas + 1 glossário
+        const guideSectionIds = ['guide-1', 'guide-2', 'guide-3', 'guide-4', 'guide-5', 'guide-6', 'guide-7'];
+
+        /**
+         * NOVO: Verifica se o questionário pode ser desbloqueado.
+         */
+        function checkUnlockQuiz() {
+            const quizTabButton = document.getElementById('quiz-tab-button');
+            const quizContent = document.getElementById('quiz-content-wrapper');
+            const quizLockOverlay = document.getElementById('quiz-lock-overlay');
+            const reqGuide = document.getElementById('lock-req-guide');
+            const reqEssays = document.getElementById('lock-req-essays');
+            const reqGlossary = document.getElementById('lock-req-glossary');
+
+            const guideComplete = progress.guideSections.size === guideSectionIds.length;
+            const essaysComplete = progress.essaysViewed;
+            const glossaryComplete = progress.glossaryGameCompleted; // (só é true a 100%)
+            
+            // Atualiza o checklist visual
+            if(guideComplete) reqGuide.innerHTML = `<span class="text-green-500 font-semibold">✓</span> Completar a leitura do Guia de Estudo.`;
+            if(essaysComplete) reqEssays.innerHTML = `<span class="text-green-500 font-semibold">✓</span> Visitar as Questões Dissertativas.`;
+            if(glossaryComplete) reqGlossary.innerHTML = `<span class="text-green-500 font-semibold">✓</span> Completar o exercício do Glossário.`;
+
+            if (guideComplete && essaysComplete && glossaryComplete) {
+                // UNLOCK
+                quizTabButton.disabled = false;
+                quizTabButton.classList.remove('text-gray-400', 'cursor-not-allowed');
+                quizTabButton.classList.add('text-gray-500', 'hover:text-blue-700');
+                quizContent.style.display = 'block';
+                quizLockOverlay.style.display = 'none';
+            } else {
+                // LOCK (Estado por defeito)
+                quizTabButton.disabled = true;
+                quizTabButton.classList.add('text-gray-400', 'cursor-not-allowed');
+                quizTabButton.classList.remove('text-gray-500', 'hover:text-blue-700');
+                quizContent.style.display = 'none';
+                quizLockOverlay.style.display = 'block';
+            }
+        }
+
+        /**
+         * Atualiza a barra de progresso global e os contadores.
+         */
+        function updateProgressBar() {
+            let achievedPoints = 0;
+            
+            // 1. Pontos do Guia (7 pontos)
+            achievedPoints += progress.guideSections.size;
+            document.getElementById('guideProgressText').textContent = `Guia: ${progress.guideSections.size}/7`;
+            
+            // 2. Ponto do Questionário (1 ponto)
+            if (progress.quizCompleted) {
+                achievedPoints++;
+                document.getElementById('quizProgressText').innerHTML = `Questionário: 1/1 <span class="text-green-500">✓</span>`;
+            } else {
+                document.getElementById('quizProgressText').textContent = `Questionário: 0/1`;
+            }
+
+            // 3. Ponto das Dissertativas (1 ponto)
+            if (progress.essaysViewed) {
+                achievedPoints++;
+                document.getElementById('essayProgressText').innerHTML = `Dissertativas: 1/1 <span class="text-green-500">✓</span>`;
+            } else {
+                document.getElementById('essayProgressText').textContent = `Dissertativas: 0/1`;
+            }
+
+            // 4. Ponto do Glossário (1 ponto)
+            if (progress.glossaryGameCompleted) {
+                achievedPoints++;
+                document.getElementById('glossaryProgressText').innerHTML = `Glossário: 1/1 <span class="text-green-500">✓</span>`;
+            } else {
+                document.getElementById('glossaryProgressText').textContent = `Glossário: 0/1`;
+            }
+
+            // Calcular e aplicar a percentagem
+            const percentage = (achievedPoints / totalProgressPoints) * 100;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = Math.round(percentage) + '%';
+
+            // NOVO: Verifica se pode desbloquear o quiz
+            checkUnlockQuiz();
+        }
+
+        /**
+         * Rastreia a leitura das secções do guia quando expandidas.
+         */
+        function trackReading(sectionId) {
+            const detailElement = event.target;
+            
+            // Só marcar como lido se o <details> estiver a ser ABERTO
+            if (detailElement.open && !progress.guideSections.has(sectionId)) {
+                progress.guideSections.add(sectionId);
+                document.getElementById(`check-${sectionId}`).classList.remove('hidden');
+                document.getElementById('guideCounter').textContent = `Secções lidas: ${progress.guideSections.size} de 7`;
+                updateProgressBar();
+            }
+        }
+
+        /**
+         * Marca todas as secções do guia como lidas.
+         */
+        function markAllAsRead() {
+            guideSectionIds.forEach(id => {
+                if (!progress.guideSections.has(id)) {
+                    progress.guideSections.add(id);
+                    document.getElementById(`check-${id}`).classList.remove('hidden');
+                    
+                    // Encontrar o <details> e abri-lo visualmente
+                    const detailElement = document.querySelector(`details[ontoggle="trackReading('${id}')"]`);
+                    if (detailElement && !detailElement.open) {
+                        detailElement.open = true;
+                    }
+                }
+            });
+            document.getElementById('guideCounter').textContent = `Secções lidas: ${progress.guideSections.size} de 7`;
+            updateProgressBar();
+        }
+
+        /**
+         * Gestão das Abas (MODIFICADA)
+         */
+        let activeTabId = 'guide'; 
+
+        function showTab(tabId) {
+            if (tabId === activeTabId) return; 
+
+            // Esconder a aba antiga
+            const oldTabContent = document.getElementById(activeTabId);
+            if (oldTabContent) {
+                oldTabContent.classList.remove('active');
+                oldTabContent.classList.add('hidden');
+                oldTabContent.style.opacity = 0;
+            }
+
+            // Remover 'active' de todos os botões
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Mostrar a nova aba
+            const activeTabContent = document.getElementById(tabId);
+            activeTabContent.classList.remove('hidden'); 
+            
+            setTimeout(() => {
+                activeTabContent.classList.add('active'); 
+            }, 10); 
+
+            // Ativar o botão correspondente (se existir)
+            const activeButton = document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+
+            activeTabId = tabId;
+
+            // Tracking de Progresso ao visitar abas
+            if (tabId === 'essays' && !progress.essaysViewed) {
+                progress.essaysViewed = true;
+                updateProgressBar(); // (que por sua vez chama checkUnlockQuiz)
+            }
+        }
+
+        /**
+         * Lógica das Questões Dissertativas
+         */
+        function toggleAnswer(buttonElement) {
+            const answerDiv = buttonElement.nextElementSibling;
+            if (answerDiv.style.display === 'block') {
+                answerDiv.style.display = 'none';
+                buttonElement.textContent = "Comparar com a Resposta Proposta";
+            } else {
+                answerDiv.style.display = 'block';
+                buttonElement.textContent = "Ocultar Resposta Proposta";
+                
+                if (!progress.essaysViewed) {
+                    progress.essaysViewed = true;
+                    updateProgressBar();
+                }
+            }
+        }
+
+        // --- Lógica do Questionário ---
+        const quizData = [
+            // ... (Array quizData completo - sem alteração) ...
+             {
+                question: "Qual foi a principal fonte de financiamento que permitiu a D. João V governar como um monarca absoluto sem convocar as Cortes?",
+                type: 'mcq-single',
+                options: [
+                    "Impostos sobre a agricultura em Portugal.",
+                    "Empréstimos de bancos italianos.",
+                    "Ouro e diamantes provenientes do Brasil.",
+                    "Donativos da Igreja Católica."
+                ],
+                correct: [2], 
+                feedback: "Correto. A torrente de ouro e diamantes do Brasil deu ao rei uma autonomia financeira sem precedentes, permitindo-lhe financiar o Estado e as obras monumentais sem depender das Cortes."
+            },
+            {
+                question: "Que estilo artístico floresceu durante o reinado de D. João V, sendo usado como instrumento de propaganda do poder régio e da Igreja?",
+                type: 'mcq-single',
+                options: [
+                    "Gótico",
+                    "Renascentista",
+                    "Barroco",
+                    "Neoclássico"
+                ],
+                correct: [2],
+                feedback: "Correto. O estilo Barroco, com a sua grandiosidade, exuberância e uso de talha dourada, foi a expressão máxima da riqueza e do poder da monarquia absoluta e da Igreja da Contrarreforma."
+            },
+            {
+                question: "D. João V convocou as Cortes (assembleia dos três estados) várias vezes durante o seu reinado de 44 anos.",
+                type: 'tf', 
+                options: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correct: [1], 
+                feedback: "Correto. D. João V marcou uma rutura ao não convocar as Cortes NENHUMA vez, consolidando o seu poder unilateral, pois não precisava delas para aprovar impostos."
+            },
+            {
+                question: "Selecione as características que definem o estilo Barroco Joanino (múltiplas respostas):",
+                type: 'mcq-multiple',
+                options: [
+                    "Uso extensivo de talha dourada.",
+                    "Simplicidade e linhas retas.",
+                    "\"Horror ao vazio\" (preenchimento de todo o espaço).",
+                    "Utilização de painéis de azulejos e mármores coloridos."
+                ],
+                correct: [0, 2, 3],
+                feedback: "Correto. O Barroco Joanino é definido pela exuberância, preenchendo todas as superfícies (horror ao vazio) com materiais luxuosos como a talha dourada, azulejos e mármores. A simplicidade e linhas retas são características do Neoclassicismo, que veio depois."
+            },
+            {
+                question: "Qual destas obras monumentais foi uma complexa obra de engenharia destinada a resolver o problema de abastecimento de água a Lisboa?",
+                type: 'mcq-single',
+                options: [
+                    "Palácio-Convento de Mafra",
+                    "Biblioteca Joanina de Coimbra",
+                    "Aqueduto das Águas Livres",
+                    "Paço da Ribeira"
+                ],
+                correct: [2],
+                feedback: "Correto. O Aqueduto das Águas Livres, com os seus 58 km de extensão e arcos impressionantes, foi a obra de engenharia hidráulica que levou água à capital."
+            },
+            {
+                question: "O Palácio-Convento de Mafra, a \"construção barroca por excelência\", integrava múltiplas funções.",
+                type: 'tf',
+                options: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correct: [0], 
+                feedback: "Correto. Mafra é um complexo monumental que inclui um palácio real, uma basílica, um convento para frades e uma das mais importantes bibliotecas da Europa."
+            },
+            {
+                question: "Qual era a instituição mais temida em Portugal durante este período, responsável pela perseguição a cristãos-novos acusados de praticar o judaísmo?",
+                type: 'mcq-single',
+                options: [
+                    "As Secretarias de Estado",
+                    "O Tribunal do Santo Ofício (Inquisição)",
+                    "As Cortes",
+                    "A Universidade de Coimbra"
+                ],
+                correct: [1],
+                feedback: "Correto. A Inquisição era a instituição responsável por garantir a \"pureza da fé\", usando métodos como a tortura e os Autos de Fé, sendo os cristãos-novos as suas principais vítimas."
+            },
+            {
+                question: "Como era estruturada a sociedade portuguesa do século XVIII?",
+                type: 'mcq-single',
+                options: [
+                    "Num sistema de classes flexível, baseado na riqueza.",
+                    "Numa sociedade de ordens rígida (Clero, Nobreza, Povo), baseada no nascimento.",
+                    "Numa democracia com representação popular.",
+                    "Num sistema feudal com suseranos e vassalos."
+                ],
+                correct: [1],
+                feedback: "Correto. Era uma sociedade de ordens (Antigo Regime), onde o Clero e a Nobreza (privilegiados) contrastavam com o Povo (não privilegiado, que pagava impostos)."
+            },
+            {
+                question: "O que eram os \"Autos de Fé\"?",
+                type: 'mcq-single',
+                options: [
+                    "Leis assinadas pelo rei D. João V.",
+                    "Festivais de ópera financiados pela coroa.",
+                    "Cerimónias públicas de punição dos condenados pela Inquisição.",
+                    "Debates filosóficos na Biblioteca Joanina."
+                ],
+                correct: [2],
+                feedback: "Correto. Eram espetáculos públicos onde os condenados pela Inquisição recebiam as suas sentenças, muitas vezes a morte na fogueira, servindo como instrumento de controlo social."
+            },
+            {
+                question: "Selecione os grupos sociais que, na sociedade de ordens, gozavam de privilégios como a isenção de impostos (múltiplas respostas):",
+                type: 'mcq-multiple',
+                options: [
+                    "Clero",
+                    "Povo (camponeses e artesãos)",
+                    "Nobreza",
+                    "Burguesia comercial"
+                ],
+                correct: [0, 2],
+                feedback: "Correto. O Clero e a Nobreza eram as ordens privilegiadas, isentas da maioria dos impostos e com acesso exclusivo aos cargos mais altos. O Povo e a burguesia (parte do Povo) suportavam a carga fiscal."
+            },
+            {
+                question: "A presença do rei D. João V nos Autos de Fé era um ato político que legitimava as ações da Inquisição.",
+                type: 'tf',
+                options: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correct: [0], 
+                feedback: "Correto. A presença do rei não era acidental; funcionava como uma sanção pública, reforçando o papel do trono como o derradeiro defensor da fé católica e da ordem social vigente."
+            },
+            {
+                question: "A Biblioteca Joanina, uma \"obra-prima única do Barroco\", situa-se na Universidade de que cidade?",
+                type: 'mcq-single',
+                options: [
+                    "Lisboa",
+                    "Porto",
+                    "Mafra",
+                    "Coimbra"
+                ],
+                correct: [3],
+                feedback: "Correto. A magnífica Biblioteca Joanina, originalmente chamada \"Casa da Livraria\", foi construída na Universidade de Coimbra, simbolizando o investimento régio no conhecimento."
+            },
+            {
+                question: "Qual o monarca estrangeiro cujo modelo de \"Rei Sol\" e de magnificência da corte influenciou fortemente D. João V?",
+                type: 'mcq-single',
+                options: [
+                    "Luís XIV de França",
+                    "Henrique VIII de Inglaterra",
+                    "Filipe II de Espanha",
+                    "Pedro, o Grande, da Rússia"
+                ],
+                correct: [0],
+                feedback: "Correto. O modelo de Luís XIV, o \"Rei Sol\" francês, com a sua corte em Versalhes, foi a principal inspiração para a afirmação do poder absoluto e da magnificência cultural de D. João V."
+            },
+            {
+                question: "O conceito de \"Ouro e Sombra\" usado na conclusão do relatório significa que:",
+                type: 'mcq-single',
+                options: [
+                    "O ouro do Brasil eventualmente acabou, levando o reino à sombra da pobreza.",
+                    "O esplendor cultural (Ouro) era uma contradição total e oposta à repressão da Inquisição (Sombra).",
+                    "O esplendor (Ouro) e a repressão (Sombra) eram duas faces do mesmo sistema de poder absolutista.",
+                    "A arte barroca usava técnicas de pintura de luz e sombra (chiaroscuro)."
+                ],
+                correct: [2],
+                feedback: "Correto. A tese central é que o Ouro (cultura, riqueza) e a Sombra (Inquisição, sociedade rígida) não se opunham, mas eram ambos instrumentos do mesmo poder absoluto, usados para propaganda e controlo, respetivamente."
+            },
+            {
+                question: "Quais dos seguintes produtos, além do ouro, contribuíam para a riqueza da Coroa portuguesa (múltiplas respostas)?",
+                type: 'mcq-multiple',
+                options: [
+                    "Açúcar",
+                    "Tabaco",
+                    "Trigo do Alentejo",
+                    "Vinho e Sal"
+                ],
+                correct: [0, 1, 3],
+                feedback: "Correto. As fontes mencionam que, além dos metais preciosos, os lucros do comércio de açúcar, tabaco, vinho e sal eram fundamentais para as finanças da Coroa. O trigo era importante internamente, mas não uma fonte de riqueza colonial como as outras."
+            }
+        ];
+        let userResults = {
+            score: 0,
+            total: quizData.length,
+            answered: [] 
+        };
+        let currentQuizIndices = quizData.map((_, i) => i);
+
+        function renderQuiz(indicesToRender) {
+            currentQuizIndices = indicesToRender;
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = ''; 
+            currentQuizIndices.forEach((questionIndex, loopIndex) => {
+                const q = quizData[questionIndex];
+                let optionsHtml = '';
+                if (q.type === 'tf') {
+                    optionsHtml = q.options.map((option, i) => `
+                        <label class="block p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="question-${questionIndex}" value="${i}" class="mr-2 text-blue-600 focus:ring-blue-500">
+                            ${option}
+                        </label>
+                    `).join('');
+                } else if (q.type === 'mcq-single') {
+                     optionsHtml = q.options.map((option, i) => `
+                        <label class="block p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="question-${questionIndex}" value="${i}" class="mr-2 text-blue-600 focus:ring-blue-500">
+                            ${option}
+                        </label>
+                    `).join('');
+                } else if (q.type === 'mcq-multiple') {
+                    optionsHtml = q.options.map((option, i) => `
+                        <label class="block p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input type="checkbox" name="question-${questionIndex}" value="${i}" class="mr-2 text-blue-600 rounded focus:ring-blue-500">
+                            ${option}
+                        </label>
+                    `).join('');
+                }
+                const questionElement = document.createElement('div');
+                questionElement.className = 'p-6 border rounded-lg shadow-sm bg-gray-50';
+                questionElement.innerHTML = `
+                    <p class="text-lg font-semibold mb-4">${loopIndex + 1}. ${q.question}</p>
+                    <div class="space-y-3 ${q.type === 'mcq-multiple' ? 'question-multiple-choice' : ''}">
+                        ${optionsHtml}
+                    </div>
+                    <div id="feedback-${questionIndex}" class="feedback-message mt-4"></div>
+                `;
+                quizContainer.appendChild(questionElement);
+            });
+        }
+
+        /**
+         * Submete o questionário (MODIFICADO para tracking de pontuação)
+         */
+        function submitQuiz() {
+            userResults.score = 0;
+            userResults.answered = [];
+            userResults.total = currentQuizIndices.length; 
+            const quizForm = document.getElementById('quiz-form');
+            const gabaritoContent = document.getElementById('gabarito-content');
+            gabaritoContent.innerHTML = ''; 
+
+            currentQuizIndices.forEach((questionIndex) => {
+                const q = quizData[questionIndex];
+                const feedbackElement = document.getElementById(`feedback-${questionIndex}`);
+                let isCorrect = false;
+                let selectedAnswers = [];
+
+                if (q.type === 'tf' || q.type === 'mcq-single') {
+                    const selectedOption = quizForm.querySelector(`input[name="question-${questionIndex}"]:checked`);
+                    if (selectedOption) {
+                        const selectedValue = parseInt(selectedOption.value);
+                        selectedAnswers.push(selectedValue);
+                        isCorrect = q.correct.includes(selectedValue);
+                    }
+                } else if (q.type === 'mcq-multiple') {
+                    const selectedOptions = quizForm.querySelectorAll(`input[name="question-${questionIndex}"]:checked`);
+                    selectedAnswers = Array.from(selectedOptions).map(opt => parseInt(opt.value));
+                    
+                    isCorrect = selectedAnswers.length === q.correct.length &&
+                                selectedAnswers.every(val => q.correct.includes(val));
+                }
+
+                if (isCorrect) {
+                    userResults.score++;
+                }
+
+                userResults.answered.push({
+                    questionIndex: questionIndex,
+                    isCorrect: isCorrect,
+                    selected: selectedAnswers,
+                    correct: q.correct,
+                    questionText: q.question,
+                    options: q.options
+                });
+
+                feedbackElement.style.display = 'block';
+                if (isCorrect) {
+                    feedbackElement.innerHTML = `<strong>Correto!</strong> ${q.feedback}`;
+                    feedbackElement.className = 'feedback-message feedback-correct';
+                } else {
+                    feedbackElement.innerHTML = `<strong>Incorreto.</strong> ${q.feedback}`;
+                    feedbackElement.className = 'feedback-message feedback-incorrect';
+                }
+
+                const correctAnswersText = q.correct.map(i => q.options[i]).join(', ');
+                const gabaritoItem = document.createElement('p');
+                gabaritoItem.className = 'text-sm';
+                gabaritoItem.innerHTML = `<strong class="font-semibold">${questionIndex + 1}.</strong> ${q.question} <br> <span class="text-green-700"><strong>R:</strong> ${correctAnswersText}</span>`;
+                gabaritoContent.appendChild(gabaritoItem);
+            });
+
+            document.getElementById('gabarito-container').classList.remove('hidden');
+            
+            // --- Tracking de Progresso (MODIFICADO) ---
+            if (!progress.quizCompleted) {
+                progress.quizCompleted = true;
+                updateProgressBar();
+            }
+            // Armazena a pontuação do questionário (0-75) APENAS na primeira tentativa completa
+            if (currentQuizIndices.length === quizData.length && progress.quizPersistentScore === 0) {
+                 progress.quizPersistentScore = userResults.score * 5; // 5% * 15 questões = 75%
+            }
+            // --- Fim do Tracking ---
+
+            generateReport(); // Gera o relatório/certificado
+            
+            // NÃO precisamos mais de ativar o botão da aba, pois ele foi removido.
+            // Apenas mostramos a aba 'report'.
+            showTab('report');
+            document.getElementById('report').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Helper para feedback da classificação
+         */
+        function getGradeFeedback(score) {
+            if (score >= 90) return { text: "Excelente! Demonstrou um domínio extraordinário do tema.", color: "text-green-700" };
+            if (score >= 75) return { text: "Muito Bom! Tem um conhecimento sólido sobre o Absolutismo Joanino.", color: "text-blue-700" };
+            if (score >= 50) return { text: "Suficiente. Compreende os conceitos-chave, mas continue a rever.", color: "text-yellow-700" };
+            return { text: "Insuficiente. Recomendamos uma revisão atenta do Guia e Glossário.", color: "text-red-700" };
+        }
+
+        /**
+         * Gera o relatório final (MODIFICADO para Certificado)
+         */
+        function generateReport() {
+            const reportContent = document.getElementById('report-content');
+            const reportReview = document.getElementById('report-review');
+            const reportReviewList = document.getElementById('report-review-list');
+            const reviewMessage = document.getElementById('review-message');
+            
+            const studentName = document.getElementById('studentName').value || "Aluno(a)";
+
+            // --- CÁLCULO DA CLASSIFICAÇÃO FINAL ---
+            // 1. Guia de Estudo (Máx 5%)
+            const guideScore = Math.min(progress.guideSections.size, 5) * 1;
+            
+            // 2. Glossário (Máx 10%)
+            // (progress.glossaryScore é atualizado em checkMatchingGame())
+            const glossaryScore = progress.glossaryScore * 1;
+
+            // 3. Questões Dissertativas (Máx 10%)
+            let filledEssays = 0;
+            document.querySelectorAll('#essays textarea').forEach(ta => {
+                if (ta.value.trim().length > 0) filledEssays++;
+            });
+            const essayScore = filledEssays * 2;
+
+            // 4. Questionário (Máx 75%)
+            // (progress.quizPersistentScore é atualizado em submitQuiz() na primeira tentativa completa)
+            const quizScore = progress.quizPersistentScore;
+
+            const totalScore = guideScore + glossaryScore + essayScore + quizScore;
+            const gradeInfo = getGradeFeedback(totalScore);
+
+            // --- GERAR O CERTIFICADO ---
+            reportContent.innerHTML = `
+                <div class="border-4 border-blue-800 p-6 rounded-lg bg-gray-50 shadow-lg relative">
+                    <h2 class="text-3xl font-bold text-center text-blue-800 mb-4">CERTIFICADO DE ESTUDO</h2>
+                    <p class="text-center text-lg text-gray-700">Este certificado é atribuído a</p>
+                    <p class="text-4xl font-bold text-center text-gray-900 my-6">${studentName}</p>
+                    <p class="text-center text-lg text-gray-700">pela conclusão do guia de estudo sobre</p>
+                    <p class="text-2xl font-semibold text-center text-blue-700 mb-8">O Absolutismo Joanino e o Seu Legado</p>
+                    
+                    <p class="text-center text-lg text-gray-700">Classificação Final:</p>
+                    <p class="text-7xl font-bold text-center ${gradeInfo.color} my-4">${totalScore}%</p>
+                    <p class="text-center text-lg font-semibold ${gradeInfo.color} mb-10">${gradeInfo.text}</p>
+                    
+                    <h4 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Detalhes da Classificação:</h4>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-base">
+                        <span class="text-gray-700">Leitura do Guia:</span>
+                        <span class="font-bold text-right">${guideScore} / 5%</span>
+                        
+                        <span class="text-gray-700">Exercício do Glossário:</span>
+                        <span class="font-bold text-right">${glossaryScore} / 10%</span>
+                        
+                        <span class="text-gray-700">Respostas Dissertativas:</span>
+                        <span class="font-bold text-right">${essayScore} / 10%</span>
+                        
+                        <span class="text-gray-700">Desempenho no Questionário:</span>
+                        <span class="font-bold text-right">${quizScore} / 75%</span>
+                        
+                        <span class="text-gray-700 font-bold border-t pt-3">TOTAL:</span>
+                        <span class="font-bold text-right border-t pt-3 text-xl">${totalScore} / 100%</span>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <p><strong>Pontuação (Tentativa Atual do Questionário):</strong> <strong>${userResults.score} / ${userResults.total}</strong></p>
+                    <p class="text-sm text-gray-600">Nota: A classificação do certificado para o questionário (75%) é baseada na sua primeira tentativa completa.</p>
+                </div>
+            `;
+
+            // --- Mostrar revisão da tentativa atual (código existente) ---
+            reportReviewList.innerHTML = '';
+            reviewMessage.classList.add('hidden');
+
+            const allAnswers = userResults.answered;
+            
+            reportReview.classList.remove('hidden');
+            // A linha abaixo, que mostrava os botões, foi removida.
+            // document.getElementById('retry-buttons-container').classList.remove('hidden');
+
+            if (allAnswers.length > 0) {
+                allAnswers.forEach(ans => {
+                    const q = ans;
+                    const correctText = q.correct.map(i => q.options[i]).join(', ');
+                    const selectedText = q.selected.length > 0 ? q.selected.map(i => q.options[i]).join(', ') : "Nenhuma resposta";
+
+                    const reviewItem = document.createElement('div');
+                    
+                    if (ans.isCorrect) {
+                        reviewItem.className = 'p-4 border rounded-lg bg-green-50 border-green-200';
+                        reviewItem.innerHTML = `
+                            <p class="font-semibold text-gray-800">${q.questionIndex + 1}. ${q.questionText}</p>
+                            <p class="text-sm mt-2"><strong class="text-green-700">A sua resposta:</strong> ${selectedText} (Correta)</p>
+                        `;
+                    } else {
+                        reviewItem.className = 'p-4 border rounded-lg bg-red-50 border-red-200';
+                        reviewItem.innerHTML = `
+                            <p class="font-semibold text-gray-800">${q.questionIndex + 1}. ${q.questionText}</p>
+                            <p class="text-sm mt-2"><strong class="text-red-700">A sua resposta:</strong> ${selectedText}</p>
+                            <p class="text-sm"><strong class="text-green-700">Resposta correta:</strong> ${correctText}</p>
+                        `;
+                    }
+                    reportReviewList.appendChild(reviewItem);
+                });
+            }
+
+            // --- NOVO: Desativar todas as abas de navegação ---
+            const navTabButtons = document.querySelectorAll('nav .tab-button');
+            navTabButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('text-gray-400', 'cursor-not-allowed');
+                button.classList.remove('hover:text-blue-700', 'active'); // Garante a remoção de qualquer estado ativo
+            });
+        }
+
+        /* --- As funções restartQuiz() e retryIncorrect() foram removidas --- */
+        /*
+        function restartQuiz() {
+            // ... (código removido) ...
+        }
+
+        function retryIncorrect() {
+            // ... (código removido) ...
+        }
+        */
+
+        // --- Lógica do Glossário Interativo ---
+        const glossaryData = [
+            // ... (Array glossaryData completo - sem alteração) ...
+            { id: "term1", term: "Absolutismo Joanino", definition: "Modelo de governação de D. João V (1706-1750), caracterizado pela concentração total do poder no rei, que governava sem a convocação das Cortes, e pela utilização da riqueza colonial para financiar uma política de grandeza e propaganda." },
+            { id: "term2", term: "Auto de Fé", definition: "Cerimónia pública onde a Inquisição anunciava e executava as sentenças (penitência ou morte na fogueira) dos condenados por heresia. Funcionava como um espetáculo de poder para intimidar a população." },
+            { id: "term3", term: "Azulejos", definition: "Painéis de cerâmica vidrada, extensivamente usados no Barroco Joanino para decorar o interior e exterior de igrejas e palácios, muitas vezes narrando histórias religiosas ou cenas do quotidiano." },
+            { id: "term4", term: "Barroco", definition: "Estilo artístico que dominou o período joanino, caracterizado pela grandiosidade, dramatismo, \"horror ao vazio\" (decoração intensa), linhas curvas e uso de materiais luxuosos (talha dourada, mármores)." },
+            { id: "term5", term: "Cortes", definition: "A assembleia tradicional do reino português, que reunia os representantes das três ordens sociais (Clero, Nobreza e Povo). D. João V notabilizou-se por nunca as ter convocado." },
+            { id: "term6", term: "Cristãos-Novos", definition: "Descendentes de judeus convertidos à força ao cristianismo. Eram as principais vítimas da Inquisição, frequentemente acusados de praticar o judaísmo em segredo." },
+            { id: "term7", term: "Horror ao Vazio (Horror Vacui)", definition: "Uma característica chave da estética Barroca, que consiste em preencher toda a superfície disponível com decoração (talha, pintura, azulejos), de forma a criar um efeito de opulência e esplendor." },
+            { id: "term8", term: "Inquisição (Tribunal do Santo Ofício)", definition: "Instituição da Igreja Católica destinada a garantir a \"pureza da fé\", perseguindo, torturando e condenando aqueles considerados hereges. Em Portugal, foi um instrumento de controlo social e religioso." },
+            { id: "term9", term: "Sociedade de Ordens", definition: "Estrutura social do Antigo Regime, baseada na desigualdade de nascimento. Dividia-se em Clero e Nobreza (grupos privilegiados, isentos de impostos) e Povo (grupo não privilegiado, que pagava os impostos)." },
+            { id: "term10", term: "Talha Dourada", definition: "Madeira esculpida e revestida a folha de ouro. Foi usada de forma exuberante no interior das igrejas barrocas em Portugal, graças à abundância de ouro do Brasil, para materializar a riqueza do reino e o poder divino." }
+        ];
+
+        function shuffleArray(array) {
+            let newArray = [...array]; 
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initMatchingGame() {
+            const termsContainer = document.getElementById('term-targets');
+            const definitionsContainer = document.getElementById('definition-draggables');
+            const feedback = document.getElementById('matching-feedback');
+            termsContainer.innerHTML = '';
+            definitionsContainer.innerHTML = '';
+            feedback.innerHTML = '';
+            const shuffledDefinitions = shuffleArray(glossaryData);
+            glossaryData.forEach(item => {
+                const termElement = document.createElement('div');
+                termElement.className = 'term-drop-zone p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50';
+                termElement.dataset.termId = item.id; 
+                termElement.setAttribute('ondragover', 'allowDrop(event)');
+                termElement.setAttribute('ondragleave', 'handleDragLeave(event)');
+                termElement.setAttribute('ondrop', 'drop(event)');
+                termElement.innerHTML = `
+                    <p class="font-semibold text-gray-800 mb-2">${item.term}</p>
+                    <div class="drop-target min-h-[5rem]"></div>
+                `;
+                termsContainer.appendChild(termElement);
+            });
+            shuffledDefinitions.forEach(item => {
+                const defElement = document.createElement('div');
+                defElement.id = `def-${item.id}`;
+                defElement.className = 'definition-draggable p-3 border bg-white rounded-lg shadow-sm cursor-move hover:shadow-md';
+                defElement.dataset.termId = item.id; 
+                defElement.setAttribute('draggable', 'true');
+                defElement.setAttribute('ondragstart', 'drag(event)');
+                defElement.setAttribute('ondragend', 'dragEnd(event)'); 
+                defElement.innerHTML = `<p class="text-sm text-gray-700">${item.definition}</p>`;
+                definitionsContainer.appendChild(defElement);
+            });
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            const target = ev.target.closest('.term-drop-zone');
+            if (target) {
+                target.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(ev) {
+             const target = ev.target.closest('.term-drop-zone');
+             if (target) {
+                target.classList.remove('drag-over');
+             }
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text/plain", ev.target.id);
+            setTimeout(() => ev.target.classList.add('dragging'), 0);
+        }
+
+        function dragEnd(ev) {
+            ev.target.classList.remove('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const draggableId = ev.dataTransfer.getData("text/plain");
+            const draggableElement = document.getElementById(draggableId);
+            const dropZone = ev.target.closest('.term-drop-zone');
+            if (!dropZone || !draggableElement) return;
+            dropZone.classList.remove('drag-over');
+            draggableElement.classList.remove('dragging');
+            const targetBox = dropZone.querySelector('.drop-target');
+            if (targetBox.firstChild) {
+                document.getElementById('definition-draggables').appendChild(targetBox.firstChild);
+            }
+            targetBox.appendChild(draggableElement);
+        }
+        
+        /**
+         * Verifica o jogo de associação (MODIFICADO para tracking de pontuação)
+         */
+        function checkMatchingGame() {
+            const termZones = document.querySelectorAll('.term-drop-zone');
+            let correctCount = 0;
+            const feedback = document.getElementById('matching-feedback');
+            
+            termZones.forEach(zone => {
+                const targetId = zone.dataset.termId;
+                const droppedElement = zone.querySelector('.definition-draggable');
+                zone.classList.remove('zone-correct', 'zone-incorrect');
+                if (droppedElement) {
+                    const droppedId = droppedElement.dataset.termId;
+                    if (targetId === droppedId) {
+                        zone.classList.add('zone-correct');
+                        correctCount++;
+                    } else {
+                        zone.classList.add('zone-incorrect');
+                    }
+                } else {
+                    zone.classList.add('zone-incorrect');
+                }
+            });
+
+            // --- Armazenar pontuação para o certificado (0-10) ---
+            progress.glossaryScore = correctCount;
+
+            // --- Tracking de Progresso (Barra) ---
+            if (correctCount === glossaryData.length) {
+                feedback.innerHTML = `<p class="text-green-700 font-semibold">Excelente! Acertou em todas as associações!</p>`;
+                if (!progress.glossaryGameCompleted) {
+                    progress.glossaryGameCompleted = true;
+                    updateProgressBar(); // (que por sua vez chama checkUnlockQuiz)
+                }
+            } else {
+                feedback.innerHTML = `<p class="text-blue-800 font-semibold">Conseguiu ${correctCount} de ${glossaryData.length} associações corretas. Tente novamente!</p>`;
+                // Se o utilizador já tinha acertado e agora falhou, mantemos o progresso
+                if (progress.glossaryGameCompleted) {
+                    progress.glossaryGameCompleted = false;
+                     updateProgressBar();
+                }
+            }
+        }
+
+        // --- Inicialização ---
+        window.onload = () => {
+            const allIndices = quizData.map((_, i) => i);
+            renderQuiz(allIndices);
+            initMatchingGame();
+            updateProgressBar(); // Inicia a barra de progresso a 0%
+            checkUnlockQuiz(); // Define o estado inicial do quiz (bloqueado)
+            
+            // Ativa a primeira aba (para a animação de fade-in)
+            const firstTab = document.getElementById('guide');
+            firstTab.classList.add('active');
+            firstTab.style.opacity = 1;
+        };
+    </script>
+
+</body>
+</html>
